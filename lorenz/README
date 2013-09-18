@@ -1,0 +1,20 @@
+Assigment 2: Lorenz Attractor
+Domenic Murtari (domenic.murtari@gmail.com)
+
+Default Parameters for the Lorenz Attractor:
+s = 1
+b = 2.66666
+r = 28
+
+CONTROLS:
+* Esc to exit
+* - to zoom out
+* + to zoom in 
+* Arrow Keys to change view
+* s (lowercase s) to decrease loranz parameter s by 1
+* S (capital s) to increase parameter s by 1
+* b (lowercase b) to decrease loranz parameter b by .1
+* B (capital b) to increase parameter b by .1
+* r (lowercase r) to decrease loranz parameter r by 1
+* R (capital r) to increase parameter r by 1
+* 0 to reset view and parameters
