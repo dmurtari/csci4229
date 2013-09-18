@@ -1,13 +1,11 @@
-/* 
+/*
+ *  Lorenz Attractor Drawer
  *  Domenic Murtari (domenic.murtari@gmail.com)
- *  Lorenz Attractor in 3D. Basic code skeleton borrowed from 
- *  ex6.c and Lorenz calculations from lorenz.c. 
+ *  Skeleton based on ex6.c, lorenz calculation based on lorenz.c
  */
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
-
 //  OpenGL with prototypes for glext
 #define GL_GLEXT_PROTOTYPES
 #ifdef __APPLE__
@@ -22,11 +20,11 @@ int ph=0;       // Elevation of view angle
 double z=0;     // Z variable
 double w=1;     // W variable
 double dim=2;   // Dimension of orthogonal box
+char* text[] = {"","2D","3D constant Z","3D","4D"};  // Dimension display text
 
-// Lorenz Parameters
-float s = .1;
-float b = .2666666;
-float r = 2.8;
+float s = 10;
+float b = 2.666666;
+float r = 28;
 
 /*
  *  Convenience routine to output raster text
@@ -38,12 +36,10 @@ void Print(const char* format , ...)
    char    buf[LEN];
    char*   ch=buf;
    va_list args;
-
    //  Turn the parameters into a character string
    va_start(args,format);
    vsnprintf(buf,LEN,format,args);
    va_end(args);
-
    //  Display the characters one at a time at the current raster position
    while (*ch)
       glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18,*ch++);
@@ -54,63 +50,70 @@ void Print(const char* format , ...)
  */
 void display()
 {
-   //  Clear the image
-   glClear(GL_COLOR_BUFFER_BIT);
-   //  Reset previous transforms
-   glLoadIdentity();
-   //  Set view angle
-   glRotated(ph,1,0,0);
-   glRotated(th,0,1,0);
-   
-   glColor3f(1, 1, 0);
+    //  Clear the image
+    glClear(GL_COLOR_BUFFER_BIT);
+    
+    //  Reset previous transforms
+    glLoadIdentity();
+    
+    // Set Projcetion
+    glOrtho(-1, 1, -1, 1, -10, 10);
 
-   glBegin(GL_POINTS);
-   
-   float x = 1;
-   float y = 1;
-   float z = 1;
-   float dt = 0.001;
-   int i;
-   
-   for (i=0; i<50000; i++){
+    //  Set view angle
+    glRotated(ph,1,0,0);
+    glRotated(th,0,1,0);
+    
+    float x = 1, y = 1, z = 1;
+    glBegin(GL_LINE_STRIP);
 
-      float dx = s*(y-x);
-      float dy = x*(r-z)-y;
-      float dz = x*y - b*z;
-      x += dt*dx;
-      y += dt*dy;
-      z += dt*dz;
+    int i;    
+    float dt = .001;
 
-      glVertex4f(.1*x, .1*y, .1*z, w);
-   }  
+    for (i = 0; i < 50000; i++) {    
+        
+        float dx = s*(y-x);
+        float dy = x*(r-z) - y;
+        float dz = x*y - b*z;
 
-   glEnd();
-   //  Draw axes in white
-   glColor3f(1,1,1);
-   glBegin(GL_LINES);
-   glVertex3d(0,0,0);
-   glVertex3d(1,0,0);
-   glVertex3d(0,0,0);
-   glVertex3d(0,1,0);
-   glVertex3d(0,0,0);
-   glVertex3d(0,0,1);
-   glEnd();
+        x += dt*dx;
+        y += dt*dy;
+        z += dt*dz;        
 
-   //  Label axes
-   glRasterPos3d(1,0,0);
-   Print("X");
-   glRasterPos3d(0,1,0);
-   Print("Y");
-   glRasterPos3d(0,0,1);
-   Print("Z");
-   //  Display parameters
+        // Fun with colors!
+        glColor3ub((int)x*10%255, (int)y*20%255, (int)z*20%255);
+        glVertex4f(x*.05, y*.05, z*.05, w);
+        glTranslatef(-.5, -.5, 0);
+    }
 
-   glWindowPos2i(5,5);
-   Print("View Angle=%d,%d  %s",th,ph);
 
-   //  Flush and swap
-   glFlush();
-   glutSwapBuffers();
+    glEnd();
+
+    //  Draw axes in white
+    glColor3f(1,1,1);
+    glBegin(GL_LINES);
+    glVertex3d(0,0,0);
+    glVertex3d(1,0,0);
+    glVertex3d(0,0,0);
+    glVertex3d(0,1,0);
+    glVertex3d(0,0,0);
+    glVertex3d(0,0,1);
+    glEnd();
+    
+    //  Label axes
+    glRasterPos3d(1,0,0);
+    Print("X");
+    glRasterPos3d(0,1,0);
+    Print("Y");
+    glRasterPos3d(0,0,1);
+    Print("Z");
+    
+    //  Display parameters
+    glWindowPos2i(5,5);
+    Print("View Angle=%d,%d",th,ph);
+    
+    //  Flush and swap
+    glFlush();
+    glutSwapBuffers();
 }
 
 /*
@@ -126,15 +129,40 @@ void key(unsigned char ch,int x,int y)
       th = ph = 0;
 
    //  Increase w by 0.1
-   else if (ch == '+')
-   {
-       w += 0.1;
-   }
-   //  Decrease w by 0.1
    else if (ch == '-')
    {
-       w -= 0.1;
+      w += 0.1;
    }
+   //  Decrease w by 0.1
+   else if (ch == '+' || '=')
+   {
+      w -= 0.1;
+   }
+   //  Decrease s by 1
+   else if (ch == 's'){
+      s -= 1;
+   }
+   //  Increase s by 1
+   else if (ch == 'S'){
+      s += 1;
+   }
+   //  Decrease b by .1
+   else if (ch == 'b'){
+      b -= .1;
+   }
+   //  Increase b by .1
+   else if (ch == 'B'){
+      b += .1;
+   }
+   //  Decrease r by 1
+   else if (ch == 'r'){
+      r -= 1;
+   }
+   //  Increase r by 1
+   else if (ch == 'R'){
+      r += 1;
+   }
+
    //  Tell GLUT it is necessary to redisplay the scene
    glutPostRedisplay();
 }
@@ -197,7 +225,7 @@ int main(int argc,char* argv[])
    //  Request 500 x 500 pixel window
    glutInitWindowSize(500,500);
    //  Create the window
-   glutCreateWindow("Coordinates");
+   glutCreateWindow("Assignment 2: Domenic Murtari");
    //  Tell GLUT to call "display" when the scene should be drawn
    glutDisplayFunc(display);
   //  Tell GLUT to call "reshape" when the window is resized
