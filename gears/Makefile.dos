@@ -1,0 +1,4 @@
+gears:gears.c
+	gcc -Wall -o gears gears.c -lglut32cu -lglu32 -lopengl32
+clean:
+	del *.o *.exe

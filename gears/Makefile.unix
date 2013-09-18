@@ -1,0 +1,4 @@
+gears:gears.c
+	gcc -o gears gears.c -lglut -lGLU -lGL -lm
+clean:
+	rm gears
