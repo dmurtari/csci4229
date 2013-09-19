@@ -1,0 +1,20 @@
+Observations:
+-------------
+
+The lorenz attractor seems to be very sensitive to changes in the parameters;
+when any of the parameters get small, I noticed that the attractor's "loops"
+all consolidate into one group, with one line coming off. For example, when 's'
+gets small, the attractor quickly spiral around one point instead of two, but 
+as 's' continues getting smalle, the spiral rapidly expands. 
+
+As the parameters 's' and 'b' get larger, the attractor also changes and 
+spirals around one point, similar to when the parameters get small. In contrast,
+as the parameter 'r' gets large, the attractor continues to spiral around two 
+points, and its radius appears to expand. 
+
+I found that the Lorenz attractor describes the convection of a fluid heated
+uniformly on the bottom and cooled uniformly on the top. An example of something
+that can be described by the Lorenz attractor is the Earth's atmosphere's 
+convection, where the atmosphere is heated uniformly below by the Earth, and 
+cooled uniformly on top by space (http://hypertextbook.com/chaos/21.shtml)
+

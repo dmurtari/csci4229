@@ -20,7 +20,7 @@ int ph=0;       // Elevation of view angle
 double z=0;     // Z variable
 double w=1;     // W variable
 double dim=2;   // Dimension of orthogonal box
-char* text[] = {"","2D","3D constant Z","3D","4D"};  // Dimension display text
+char* text[] = {"3D"};  // Dimension display text
 
 float s = 10;
 float b = 2.666666;
@@ -63,12 +63,15 @@ void display()
     glRotated(ph,1,0,0);
     glRotated(th,0,1,0);
     
-    float x = 1, y = 1, z = 1;
+    // Draw the Lorenz Attractor
     glBegin(GL_LINE_STRIP);
-
+    
+    float x = 1, y = 1, z = 1;
     int i;    
     float dt = .001;
 
+    // Iterate and draw Lorenz Attractor, using GL_LINE_STRIP to draw 
+    // from one vertex to another. 
     for (i = 0; i < 50000; i++) {    
         
         float dx = s*(y-x);
@@ -80,9 +83,9 @@ void display()
         z += dt*dz;        
 
         // Fun with colors!
-        glColor3ub((int)x*10%255, (int)y*20%255, (int)z*20%255);
-        glVertex4f(x*.05, y*.05, z*.05, w);
-        glTranslatef(-.5, -.5, 0);
+        glColor3ub((int)i/10%255, (int)i/15%255, (int)i/20%255);
+        // Multiply by .05 to make attractor fit in default view
+        glVertex4f(x*.05, y*.05, z*.05, w); 
     }
 
 
@@ -125,16 +128,19 @@ void key(unsigned char ch,int x,int y)
    if (ch == 27)
       exit(0);
    //  Reset view angle
-   else if (ch == '0')
+   else if (ch == '0'){
       th = ph = 0;
-
+      s = 10;
+      b = 2.666666;
+      r = 28;
+   }
    //  Increase w by 0.1
    else if (ch == '-')
    {
       w += 0.1;
    }
    //  Decrease w by 0.1
-   else if (ch == '+' || '=')
+   else if (ch == '+')
    {
       w -= 0.1;
    }
