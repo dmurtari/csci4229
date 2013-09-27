@@ -16,7 +16,7 @@
 #endif
 
 int th=0;         //  Azimuth of view angle
-int ph=0;         //  Elevation of view angle
+int ph=-5;         //  Elevation of view angle
 double zh=0;      //  Rotation of teapot
 int axes=1;       //  Display axes
 int mode=0;       //  What to display
@@ -162,7 +162,31 @@ static void drawHouse(double x, double y, double z,
   glVertex3f(+1,+2,-.25);
   glVertex3f(+1,+2,+.25);
   glEnd();
-    
+
+  // Draw a Door
+  glBegin(GL_QUADS);
+  glColor3ub(100,50,0);
+  // Front
+  glVertex3f(+.2,-1,-1.1);
+  glVertex3f(-.2,-1,-1.1);
+  glVertex3f(-.2,0,-1.1);
+  glVertex3f(+.2,0,-1.1);
+  // Top
+  glVertex3f(+.2,0,-1.1);
+  glVertex3f(+.2,0,-1.0);
+  glVertex3f(-.2,0,-1.0);
+  glVertex3f(-.2,0,-1.1);
+  // Right
+  glVertex3f(+.2,0,-1.1);
+  glVertex3f(+.2,-1,-1.1);
+  glVertex3f(+.2,-1,-1.0);
+  glVertex3f(+.2,0,-1.0);
+  // Left
+  glVertex3f(-.2,0,-1.1);
+  glVertex3f(-.2,-1,-1.1);
+  glVertex3f(-.2,-1,-1.0);
+  glVertex3f(-.2,0,-1.0);
+  glEnd();
 
   glPopMatrix();
 }
@@ -179,11 +203,23 @@ void display()
    glEnable(GL_DEPTH_TEST);
    //  Undo previous transformations
    glLoadIdentity();
+   glOrtho(-3, 3, -3, 3, -10, 10);
    //  Set view angle
    glRotatef(ph,1,0,0);
    glRotatef(th,0,1,0);
    drawHouse(0,0,0 , 1,1,1, 0);
-   //   drawHouse(1,0,0 , 1,1,1 , 0);
+   drawHouse(3,0,0 , 1,1,1 , 0);
+   drawHouse(-3,0,0 , 1,1,1 , 0);
+   drawHouse(6.5,0,-1 , 1.5,1,1 , 30);
+   drawHouse(-6.5,0,-1 , 1.5,1,1 , -30);
+
+   glColor3ub(0,30,0);
+   glBegin(GL_QUADS);
+   glVertex3f(-10,-1,-10);
+   glVertex3f(-10,-1,10);
+   glVertex3f(10,-1,10);
+   glVertex3f(10,-1,-10);
+   glEnd();
 
    glColor3f(1,1,1);
    //  Draw axes
@@ -249,8 +285,10 @@ void key(unsigned char ch,int x,int y)
    if (ch == 27)
       exit(0);
    //  Reset view angle
-   else if (ch == '0')
-      th = ph = 0;
+   else if (ch == '0'){
+      th = 0;
+      ph = 5;
+   }
    //  Toggle axes
    else if (ch == 'a' || ch == 'A')
       axes = 1-axes;

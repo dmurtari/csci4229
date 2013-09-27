@@ -1,5 +1,5 @@
-house=drawhouse
-all: $(house)
+hw=hw3
+all: $(hw)
 
 #  Unix/Linux
 %: %.c;gcc -Wall -O3 -o $@ $< -lglut -lGLU -lGL -lm
@@ -11,4 +11,4 @@ all: $(house)
 #%: %.c;gcc -Wall -O3 -o $@ $< -lglut32cu -lglu32 -lopengl32
 
 clean:
-	rm -f $(house)
+	rm -f $(hw)
