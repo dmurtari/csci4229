@@ -18,8 +18,16 @@
 int th=0;         //  Azimuth of view angle
 int ph=-5;         //  Elevation of view angle
 double zh=0;      //  Rotation of teapot
-int axes=1;       //  Display axes
+int axes=0;       //  Display axes
 int mode=0;       //  What to display
+int smoking=1;
+int FPS=60;
+static double smokeoffset=0;
+
+
+//  Cosine and Sine in degrees
+#define Cos(x) (cos((x)*3.1415927/180))
+#define Sin(x) (sin((x)*3.1415927/180))
 
 /*
  *  Convenience routine to output raster text
@@ -39,6 +47,60 @@ void Print(const char* format , ...)
    while (*ch)
       glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18,*ch++);
 }
+
+/*
+ *  Draw vertex in polar coordinates
+ */
+static void Vertex(double th,double ph)
+{
+   glColor4f(1,1,1,1);
+   glVertex3d(Sin(th)*Cos(ph) , Sin(ph) , Cos(th)*Cos(ph));
+}
+
+
+/*
+ *  Draw a sphere (version 2)
+ *     at (x,y,z)
+ *     radius (r)
+ */
+static void sphere2(double x,double y,double z,double r)
+{
+   const int d=5;
+   int th,ph;
+
+   //  Save transformation
+   glPushMatrix();
+   //  Offset and scale
+   glTranslated(x,y,z);
+   glScaled(r,r,r);
+
+   //  Latitude bands
+   for (ph=-90;ph<90;ph+=d)
+   {
+      glBegin(GL_QUAD_STRIP);
+      for (th=0;th<=360;th+=d)
+      {
+         Vertex(th,ph);
+         Vertex(th,ph+d);
+      }
+      glEnd();
+   }
+
+   //  Undo transformations
+   glPopMatrix();
+}
+
+void timer(int v) {
+  if (smoking) {
+    smokeoffset += .01;
+    if (smokeoffset > 5.0) {
+      smokeoffset -= 5.0;
+    }
+    glutPostRedisplay();
+  }
+  glutTimerFunc(1000/FPS, timer, v);
+}
+    
 
 static void drawHouse(double x, double y, double z,
 		      double dx, double dy, double dz,
@@ -162,6 +224,10 @@ static void drawHouse(double x, double y, double z,
   glVertex3f(+1,+2,-.25);
   glVertex3f(+1,+2,+.25);
   glEnd();
+  
+  // Chimney Smoke
+  sphere2(+.75,+1+smokeoffset,0, .2);
+  sphere2(+.75,-1+smokeoffset,0, .2);
 
   // Draw a Door
   glBegin(GL_QUADS);
@@ -207,18 +273,18 @@ void display()
    //  Set view angle
    glRotatef(ph,1,0,0);
    glRotatef(th,0,1,0);
-   drawHouse(0,0,0 , 1,1,1, 0);
-   drawHouse(3,0,0 , 1,1,1 , 0);
-   drawHouse(-3,0,0 , 1,1,1 , 0);
-   drawHouse(6.5,0,-1 , 1.5,1,1 , 30);
-   drawHouse(-6.5,0,-1 , 1.5,1,1 , -30);
+   drawHouse(0,0,2 , 1,1,1, 0);
+   drawHouse(3,0,2 , 1,1,1 , 0);
+   drawHouse(-3,0,2 , 1,1,1 , 0);
+   drawHouse(6.5,0,1 , 1.5,1,1 , 30);
+   drawHouse(-6.5,0,1 , 1.5,1,1 , -30);
 
    glColor3ub(0,30,0);
    glBegin(GL_QUADS);
-   glVertex3f(-10,-1,-10);
-   glVertex3f(-10,-1,10);
-   glVertex3f(10,-1,10);
-   glVertex3f(10,-1,-10);
+   glVertex3f(-100,-1,-100);
+   glVertex3f(-100,-1,100);
+   glVertex3f(100,-1,100);
+   glVertex3f(100,-1,-100);
    glEnd();
 
    glColor3f(1,1,1);
@@ -292,6 +358,8 @@ void key(unsigned char ch,int x,int y)
    //  Toggle axes
    else if (ch == 'a' || ch == 'A')
       axes = 1-axes;
+   else if (ch == 's' || ch == 'S')
+     smoking = 1-smoking;
    //  Tell GLUT it is necessary to redisplay the scene
    glutPostRedisplay();
 }
@@ -319,7 +387,7 @@ void reshape(int width,int height)
 }
 
 /*
- *  GLUT calls this toutine when there is nothing else to do
+ *  GLUT calls this routine when there is nothing else to do
  */
 void idle()
 {
@@ -344,6 +412,8 @@ int main(int argc,char* argv[])
    glutIdleFunc(idle);
    //  Tell GLUT to call "display" when the scene should be drawn
    glutDisplayFunc(display);
+   //  Tell GLUT to use timer function
+   glutTimerFunc(100, timer, 0);
    //  Tell GLUT to call "reshape" when the window is resized
    glutReshapeFunc(reshape);
    //  Tell GLUT to call "special" when an arrow key is pressed

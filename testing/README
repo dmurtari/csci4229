@@ -1,0 +1,12 @@
+Assignment 3: Drawing a Scene in 3D
+Domenic Murtari (domenic.murtari@gmail.com)
+Time taken to complete: ~4 hours
+
+The scene starts out being rendered at 5 degrees elevation to allow the 
+ground to be shown. 
+
+Arrow keys used to rotate the scene
+'a' to toggle axes
+'s' to toggle smoke animation
+0 to reset view
+Esc to exit
