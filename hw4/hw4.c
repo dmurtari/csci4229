@@ -1,6 +1,6 @@
 /*
- * Code skeleton from ex8.c provided on Moodle
- * Draws a scene with a couple of houses
+ * Code skeleton from ex8.c/ex9.c provided on Moodle
+ * Draws a scene with a couple of houses, offering orthogonal and perpective projections
  *
  */
 #include <stdio.h>
@@ -16,8 +16,8 @@
 #endif
 
 int th=0;         //  Azimuth of view angle
-int ph=-5;        //  Elevation of view angle
-double zh=0;      //  Rotation of teapot
+int ph=5;         //  Elevation of view angle
+int zh=0;
 int axes=0;       //  Display axes
 int mode=0;       //  What to display
 int fov=55;       //  Field of view (for perspective)
@@ -62,7 +62,7 @@ static void Project()
    glLoadIdentity();
    //  Perspective transformation
    if (mode)
-      gluPerspective(fov,asp,dim/4,4*dim);
+      gluPerspective(fov,asp,dim/10,10*dim);
    //  Orthogonal projection
    else
       glOrtho(-asp*dim,+asp*dim, -dim,+dim, -dim,+dim);
@@ -383,6 +383,7 @@ void special(int key,int x,int y)
    //  Keep angles to +/-360 degrees
    th %= 360;
    ph %= 360;
+   Project();
    //  Tell GLUT it is necessary to redisplay the scene
    glutPostRedisplay();
 }
