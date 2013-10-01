@@ -16,12 +16,15 @@
 #endif
 
 int th=0;         //  Azimuth of view angle
-int ph=-5;         //  Elevation of view angle
+int ph=-5;        //  Elevation of view angle
 double zh=0;      //  Rotation of teapot
 int axes=0;       //  Display axes
 int mode=0;       //  What to display
-int smoking=1;
-int FPS=60;
+int fov=55;       //  Field of view (for perspective)
+double asp=1;     //  Aspect ratio
+double dim=5.0;   //  Size of world
+int smoking=1;    //  Smoke off or on
+int FPS=60;       //  Frame rate
 static double smokeoffset=0;
 
 
@@ -46,6 +49,27 @@ void Print(const char* format , ...)
    //  Display the characters one at a time at the current raster position
    while (*ch)
       glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18,*ch++);
+}
+
+/*
+ *  Set projection
+ */
+static void Project()
+{
+   //  Tell OpenGL we want to manipulate the projection matrix
+   glMatrixMode(GL_PROJECTION);
+   //  Undo previous transformations
+   glLoadIdentity();
+   //  Perspective transformation
+   if (mode)
+      gluPerspective(fov,asp,dim/4,4*dim);
+   //  Orthogonal projection
+   else
+      glOrtho(-asp*dim,+asp*dim, -dim,+dim, -dim,+dim);
+   //  Switch to manipulating the model matrix
+   glMatrixMode(GL_MODELVIEW);
+   //  Undo previous transformations
+   glLoadIdentity();
 }
 
 /*
@@ -262,6 +286,7 @@ static void drawHouse(double x, double y, double z,
  */
 void display()
 {
+
    const double len=1.5;  //  Length of axes
    //  Erase the window and the depth buffer
    glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
@@ -269,15 +294,29 @@ void display()
    glEnable(GL_DEPTH_TEST);
    //  Undo previous transformations
    glLoadIdentity();
-   glOrtho(-3, 3, -3, 3, -10, 10);
-   //  Set view angle
-   glRotatef(ph,1,0,0);
-   glRotatef(th,0,1,0);
-   drawHouse(0,0,2 , 1,1,1, 0);
-   drawHouse(3,0,2 , 1,1,1 , 0);
-   drawHouse(-3,0,2 , 1,1,1 , 0);
-   drawHouse(6.5,0,1 , 1.5,1,1 , 30);
-   drawHouse(-6.5,0,1 , 1.5,1,1 , -30);
+ 
+ 
+   //  Perspective - set eye position
+   if (mode)
+   {
+      double Ex = -2*dim*Sin(th)*Cos(ph);
+      double Ey = +2*dim        *Sin(ph);
+      double Ez = +2*dim*Cos(th)*Cos(ph);
+      gluLookAt(Ex,Ey,Ez , 0,0,0 , 0,Cos(ph),0);
+   }
+   //  Orthogonal - set world orientation
+   else
+   {
+      glRotatef(ph,1,0,0);
+      glRotatef(th,0,1,0);
+   }
+
+
+   drawHouse(0,0,-2 , 1,1,1, 0);
+   drawHouse(3,0,-2 , 1,1,1 , 0);
+   drawHouse(-3,0,-2 , 1,1,1 , 0);
+   drawHouse(6.5,0,-3 , 1.5,1,1 , 30);
+   drawHouse(-6.5,0,-3 , 1.5,1,1 , -30);
 
    glColor3ub(0,30,0);
    glBegin(GL_QUADS);
@@ -310,7 +349,7 @@ void display()
    //  Five pixels from the lower left corner of the window
    glWindowPos2i(5,5);
    //  Print the text string
-   Print("Angle=%d,%d",th,ph);
+   Print("Angle=%d,%d  Dim=%.1f FOV=%d Projection=%s",th,ph,dim,fov,mode?"Perpective":"Orthogonal");
    //  Render the scene
    glFlush();
    //  Make the rendered scene visible
@@ -335,6 +374,12 @@ void special(int key,int x,int y)
    //  Down arrow key - decrease elevation by 5 degrees
    else if (key == GLUT_KEY_DOWN)
       ph -= 5;
+   //  PageUp key - increase dim
+   else if (key == GLUT_KEY_PAGE_UP)
+      dim += 0.1;
+   //  PageDown key - decrease dim
+   else if (key == GLUT_KEY_PAGE_DOWN && dim>1)
+      dim -= 0.1;
    //  Keep angles to +/-360 degrees
    th %= 360;
    ph %= 360;
@@ -359,7 +404,16 @@ void key(unsigned char ch,int x,int y)
    else if (ch == 'a' || ch == 'A')
       axes = 1-axes;
    else if (ch == 's' || ch == 'S')
-     smoking = 1-smoking;
+     smoking = 1-smoking; 
+   else if (ch == 'm' || ch == 'M')
+     mode = 1-mode;
+   //  Change field of view angle
+   else if (ch == '-' && ch>1)
+      fov--;
+   else if (ch == '+' && ch<179)
+      fov++;
+
+   Project();
    //  Tell GLUT it is necessary to redisplay the scene
    glutPostRedisplay();
 }
@@ -369,21 +423,12 @@ void key(unsigned char ch,int x,int y)
  */
 void reshape(int width,int height)
 {
-   const double dim=2.5;
    //  Ratio of the width to the height of the window
-   double w2h = (height>0) ? (double)width/height : 1;
+   asp = (height>0) ? (double)width/height : 1;
    //  Set the viewport to the entire window
    glViewport(0,0, width,height);
-   //  Tell OpenGL we want to manipulate the projection matrix
-   glMatrixMode(GL_PROJECTION);
-   //  Undo previous transformations
-   glLoadIdentity();
-   //  Orthogonal projection
-   glOrtho(-w2h*dim,+w2h*dim, -dim,+dim, -dim,+dim);
-   //  Switch to manipulating the model matrix
-   glMatrixMode(GL_MODELVIEW);
-   //  Undo previous transformations
-   glLoadIdentity();
+   //  Set projection
+   Project();
 }
 
 /*
@@ -407,7 +452,7 @@ int main(int argc,char* argv[])
    glutInitWindowSize(600,600);
    glutInitDisplayMode(GLUT_RGB | GLUT_DEPTH | GLUT_DOUBLE);
    //  Create the window
-   glutCreateWindow("Domenic Murtari: Assignment 3");
+   glutCreateWindow("Domenic Murtari: Assignment 4");
    //  Tell GLUT to call "idle" when there is nothing else to do
    glutIdleFunc(idle);
    //  Tell GLUT to call "display" when the scene should be drawn

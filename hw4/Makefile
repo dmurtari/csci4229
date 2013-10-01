@@ -1,4 +1,4 @@
-hw=hw3
+hw=hw4
 all: $(hw)
 
 #  Unix/Linux
