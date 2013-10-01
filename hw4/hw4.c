@@ -257,25 +257,25 @@ static void drawHouse(double x, double y, double z,
   glBegin(GL_QUADS);
   glColor3ub(100,50,0);
   // Front
-  glVertex3f(+.2,-1,-1.1);
-  glVertex3f(-.2,-1,-1.1);
-  glVertex3f(-.2,0,-1.1);
-  glVertex3f(+.2,0,-1.1);
+  glVertex3f(+.2,-1,1.1);
+  glVertex3f(-.2,-1,1.1);
+  glVertex3f(-.2,0,1.1);
+  glVertex3f(+.2,0,1.1);
   // Top
-  glVertex3f(+.2,0,-1.1);
-  glVertex3f(+.2,0,-1.0);
-  glVertex3f(-.2,0,-1.0);
-  glVertex3f(-.2,0,-1.1);
+  glVertex3f(+.2,0,1.1);
+  glVertex3f(+.2,0,1.0);
+  glVertex3f(-.2,0,1.0);
+  glVertex3f(-.2,0,1.1);
   // Right
-  glVertex3f(+.2,0,-1.1);
-  glVertex3f(+.2,-1,-1.1);
-  glVertex3f(+.2,-1,-1.0);
-  glVertex3f(+.2,0,-1.0);
+  glVertex3f(+.2,0,1.1);
+  glVertex3f(+.2,-1,1.1);
+  glVertex3f(+.2,-1,1.0);
+  glVertex3f(+.2,0,1.0);
   // Left
-  glVertex3f(-.2,0,-1.1);
-  glVertex3f(-.2,-1,-1.1);
-  glVertex3f(-.2,-1,-1.0);
-  glVertex3f(-.2,0,-1.0);
+  glVertex3f(-.2,0,1.1);
+  glVertex3f(-.2,-1,1.1);
+  glVertex3f(-.2,-1,1.0);
+  glVertex3f(-.2,0,1.0);
   glEnd();
 
   glPopMatrix();
