@@ -1,6 +1,7 @@
 /*
  * Code skeleton from ex8.c/ex9.c provided on Moodle
- * Draws a scene with a couple of houses, offering orthogonal and perpective projections
+ * Draws a scene with a couple of houses, offering orthogonal and 
+ * perpective projections
  *
  */
 #include <stdio.h>
