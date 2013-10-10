@@ -231,6 +231,29 @@ static void drawHouse(double x, double y, double z,
   glVertex3f(-.2,0,1.0);
   glEnd();
 
+  // ball(0, 4, 0, 1);
+
+  glPopMatrix();
+}
+
+static void drawFencePost(double x, double y, double z,
+		      double dx, double dy, double dz,
+		      double th){
+  // Set specular color to white
+  float white[] = {1,1,1,1};
+  float black[] = {0,0,0,1};
+  glMaterialfv(GL_FRONT_AND_BACK,GL_SHININESS,shinyvec);
+  glMaterialfv(GL_FRONT_AND_BACK,GL_SPECULAR,white);
+  glMaterialfv(GL_FRONT_AND_BACK,GL_EMISSION,black);
+
+  glPushMatrix();
+  
+  // Translations
+  glTranslated(x, y, z);
+  glRotated(th, 0, 1, 0);
+  glScaled(dx, dy, dz);
+
+
   glPopMatrix();
 }
 
@@ -349,7 +372,9 @@ void display()
      glDisable(GL_LIGHTING);
 
    //  Draw scene
-   drawHouse(0,0,-2 , 2,1,1, 0);
+   
+   drawFencePost(0, 0, 0, 1, 1, 1, 0);
+   // drawHouse(0,0,-2 , 2,1,1, 0);
    //drawHouse(3,0,-2 , 1,1,1 , 0);
    //drawHouse(-3,0,-2 , 1,1,1 , 0);
    //drawHouse(6.5,0,-3 , 1.5,1,1 , 30);
