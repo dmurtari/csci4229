@@ -51,6 +51,11 @@ float ylight  =   0;  // Elevation of light
 int FPS=60;                   //  Frame rate
 static double smokeoffset=0;  //  Offset of smoke from origin
 
+/*
+ * Draw a house, given position x, y, z and scaling factors
+ * dx, dy, dz and rotation about the z-axis th
+ *
+ */
 static void drawHouse(double x, double y, double z,
 		      double dx, double dy, double dz,
 		      double th){
@@ -229,6 +234,8 @@ static void drawHouse(double x, double y, double z,
   glPopMatrix();
 }
 
+
+
 /*
  *  Draw vertex in polar coordinates with normal
  */
@@ -342,11 +349,11 @@ void display()
      glDisable(GL_LIGHTING);
 
    //  Draw scene
-   drawHouse(0,0,-2 , 1,1,1, 0);
-   drawHouse(3,0,-2 , 1,1,1 , 0);
-   drawHouse(-3,0,-2 , 1,1,1 , 0);
-   drawHouse(6.5,0,-3 , 1.5,1,1 , 30);
-   drawHouse(-6.5,0,-3 , 1.5,1,1 , -30);
+   drawHouse(0,0,-2 , 2,1,1, 0);
+   //drawHouse(3,0,-2 , 1,1,1 , 0);
+   //drawHouse(-3,0,-2 , 1,1,1 , 0);
+   //drawHouse(6.5,0,-3 , 1.5,1,1 , 30);
+   //drawHouse(-6.5,0,-3 , 1.5,1,1 , -30);
    glColor3ub(0,30,0);
    glBegin(GL_QUADS);
    glNormal3f(0, 1, 0);
