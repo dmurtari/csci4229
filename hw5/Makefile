@@ -1,5 +1,5 @@
 #  List of all programs you want to build
-EX=ex13
+EX=hw5
 
 #  Libraries - Linux
 LIBS=-lglut -lGLU -lGL -lm
