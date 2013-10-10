@@ -46,76 +46,179 @@ float shinyvec[1];    // Shininess (value)
 int zh        =  90;  // Light azimuth
 float ylight  =   0;  // Elevation of light
 
-/*
- *  Draw a cube
- *     at (x,y,z)
- *     dimentions (dx,dy,dz)
- *     rotated th about the y axis
- */
-static void cube(double x,double y,double z,
-                 double dx,double dy,double dz,
-                 double th)
-{
-   //  Set specular color to white
-   float white[] = {1,1,1,1};
-   float black[] = {0,0,0,1};
-   glMaterialfv(GL_FRONT_AND_BACK,GL_SHININESS,shinyvec);
-   glMaterialfv(GL_FRONT_AND_BACK,GL_SPECULAR,white);
-   glMaterialfv(GL_FRONT_AND_BACK,GL_EMISSION,black);
-   //  Save transformation
-   glPushMatrix();
-   //  Offset, scale and rotate
-   glTranslated(x,y,z);
-   glRotated(th,0,1,0);
-   glScaled(dx,dy,dz);
-   //  Cube
-   glBegin(GL_QUADS);
-   //  Front
-   glColor3f(1,0,0);
-   glNormal3f( 0, 0, 1);
-   glVertex3f(-1,-1, 1);
-   glVertex3f(+1,-1, 1);
-   glVertex3f(+1,+1, 1);
-   glVertex3f(-1,+1, 1);
-   //  Back
-   glColor3f(0,0,1);
-   glNormal3f( 0, 0,-1);
-   glVertex3f(+1,-1,-1);
-   glVertex3f(-1,-1,-1);
-   glVertex3f(-1,+1,-1);
-   glVertex3f(+1,+1,-1);
-   //  Right
-   glColor3f(1,1,0);
-   glNormal3f(+1, 0, 0);
-   glVertex3f(+1,-1,+1);
-   glVertex3f(+1,-1,-1);
-   glVertex3f(+1,+1,-1);
-   glVertex3f(+1,+1,+1);
-   //  Left
-   glColor3f(0,1,0);
-   glNormal3f(-1, 0, 0);
-   glVertex3f(-1,-1,-1);
-   glVertex3f(-1,-1,+1);
-   glVertex3f(-1,+1,+1);
-   glVertex3f(-1,+1,-1);
-   //  Top
-   glColor3f(0,1,1);
-   glNormal3f( 0,+1, 0);
-   glVertex3f(-1,+1,+1);
-   glVertex3f(+1,+1,+1);
-   glVertex3f(+1,+1,-1);
-   glVertex3f(-1,+1,-1);
-   //  Bottom
-   glColor3f(1,0,1);
-   glNormal3f( 0,-one, 0);
-   glVertex3f(-1,-1,-1);
-   glVertex3f(+1,-1,-1);
-   glVertex3f(+1,-1,+1);
-   glVertex3f(-1,-1,+1);
-   //  End
-   glEnd();
-   //  Undo transofrmations
-   glPopMatrix();
+// Values to animate smoke
+int FPS=60;                   //  Frame rate
+static double smokeoffset=0;  //  Offset of smoke from origin
+
+static void drawHouse(double x, double y, double z,
+		      double dx, double dy, double dz,
+		      double th){
+  
+  const double rooftop = 2;
+  const double roofoff = 1.5;
+  const double roofwid = 1.25;
+  const double roofbot = .75;
+
+  // Set specular color to white
+  float white[] = {1,1,1,1};
+  float black[] = {0,0,0,1};
+  glMaterialfv(GL_FRONT_AND_BACK,GL_SHININESS,shinyvec);
+  glMaterialfv(GL_FRONT_AND_BACK,GL_SPECULAR,white);
+  glMaterialfv(GL_FRONT_AND_BACK,GL_EMISSION,black);
+
+  glPushMatrix();
+  
+  // Translations
+  glTranslated(x, y, z);
+  glRotated(th, 0, 1, 0);
+  glScaled(dx, dy, dz);
+
+  // Body of house
+  glBegin(GL_QUADS);
+  //Front
+  glColor3ub(153,0,0);
+  glNormal3f( 0, 0, 1);
+  glVertex3f(-1,-1, 1);
+  glVertex3f(+1,-1, 1);
+  glVertex3f(+1,+1, 1);
+  glVertex3f(-1,+1, 1);
+  //  Back
+  glColor3ub(153,0,0);
+  glNormal3f( 0, 0,-1);
+  glVertex3f(+1,-1,-1);
+  glVertex3f(-1,-1,-1);
+  glVertex3f(-1,+1,-1);
+  glVertex3f(+1,+1,-1);
+  //  Right
+  glColor3ub(153,100,0);
+  glNormal3f(+1, 0, 0);
+  glVertex3f(+1,-1,+1);
+  glVertex3f(+1,-1,-1);
+  glVertex3f(+1,+1,-1);
+  glVertex3f(+1,+1,+1);
+  //  Left
+  glColor3ub(153,100,0);
+  glNormal3f(-1, 0, 0);
+  glVertex3f(-1,-1,-1);
+  glVertex3f(-1,-1,+1);
+  glVertex3f(-1,+1,+1);
+  glVertex3f(-1,+1,-1);
+  //  Top
+  glColor3ub(153,0,100);
+  glNormal3f( 0,+1, 0);
+  glVertex3f(-1,+1,+1);
+  glVertex3f(+1,+1,+1);
+  glVertex3f(+1,+1,-1);
+  glVertex3f(-1,+1,-1);
+  //  Bottom
+  glColor3ub(153,0,100);
+  glNormal3f( 0,-1, 0);
+  glVertex3f(-1,-1,-1);
+  glVertex3f(+1,-1,-1);
+  glVertex3f(+1,-1,+1);
+  glVertex3f(-1,-1,+1);
+  glEnd();
+  
+  // Roof
+  glBegin(GL_TRIANGLES);
+  // Front
+  glColor3ub(30,30,30);
+  glNormal3f(0,       0,       +1      );
+  glVertex3f(+roofoff,+roofbot,+roofwid);
+  glVertex3f(-roofoff,+roofbot,+roofwid);
+  glVertex3f(0,+rooftop,+roofwid);
+  // Back
+  glNormal3f(0,       0,       -1      );
+  glVertex3f(+roofoff,+roofbot,-roofwid);
+  glVertex3f(-roofoff,+roofbot,-roofwid);
+  glVertex3f(0,+rooftop,-roofwid);
+  glEnd();
+  // Sides of Roof
+  glBegin(GL_QUADS);
+  // Right side
+  glColor3ub(50,50,50);
+  glVertex3f(+roofoff,+roofbot,-roofwid);
+  glVertex3f(+roofoff,+roofbot,+roofwid);
+  glVertex3f(0,+rooftop,+roofwid);
+  glVertex3f(0,+rooftop,-roofwid);
+  // Left Side
+  glColor3ub(90,90,90);
+  glVertex3f(-roofoff,+roofbot,-roofwid);
+  glVertex3f(-roofoff,+roofbot,+roofwid);
+  glVertex3f(0,+rooftop,+roofwid);
+  glVertex3f(0,+rooftop,-roofwid);  
+  // Bottom
+  glColor3ub(153,51,0);
+  glVertex3f(+roofoff,+roofbot,-roofwid);
+  glVertex3f(+roofoff,+roofbot,+roofwid);
+  glVertex3f(-roofoff,+roofbot,+roofwid);
+  glVertex3f(-roofoff,+roofbot,-roofwid);
+  glEnd();
+
+  // Draw the chimney
+  glBegin(GL_QUADS);
+  // Left
+  glColor3ub(60,0,0);
+  glVertex3f(+.5,+1,+.25);
+  glVertex3f(+.5,+1,-.25);
+  glVertex3f(+.5,+2,-.25);
+  glVertex3f(+.5,+2,+.25);
+  // Right
+  glColor3ub(60,0,0);
+  glVertex3f(+1,+1,+.25);
+  glVertex3f(+1,+1,-.25);
+  glVertex3f(+1,+2,-.25);
+  glVertex3f(+1,+2,+.25);
+  // Back
+  glColor3ub(100,0,0);
+  glVertex3f(+.5,+1,-.25);
+  glVertex3f(+.5,+2,-.25);
+  glVertex3f(+1,+2,-.25);
+  glVertex3f(+1,+1,-.25);
+  // Front
+  glColor3ub(100,0,0);
+  glVertex3f(+.5,+1,+.25);
+  glVertex3f(+.5,+2,+.25);
+  glVertex3f(+1,+2,+.25);
+  glVertex3f(+1,+1,+.25);
+  // Top
+  glColor3ub(10,10,10);
+  glVertex3f(+.5,+2,+.25);
+  glVertex3f(+.5,+2,-.25);
+  glVertex3f(+1,+2,-.25);
+  glVertex3f(+1,+2,+.25);
+  glEnd();
+  
+  // Chimney Smoke
+  //ball(+.75,+1+smokeoffset,0, .2);
+  //ball(+.75,-1+smokeoffset,0, .2);
+
+  // Draw a Door
+  glBegin(GL_QUADS);
+  glColor3ub(100,50,0);
+  // Front
+  glVertex3f(+.2,-1,1.1);
+  glVertex3f(-.2,-1,1.1);
+  glVertex3f(-.2,0,1.1);
+  glVertex3f(+.2,0,1.1);
+  // Top
+  glVertex3f(+.2,0,1.1);
+  glVertex3f(+.2,0,1.0);
+  glVertex3f(-.2,0,1.0);
+  glVertex3f(-.2,0,1.1);
+  // Right
+  glVertex3f(+.2,0,1.1);
+  glVertex3f(+.2,-1,1.1);
+  glVertex3f(+.2,-1,1.0);
+  glVertex3f(+.2,0,1.0);
+  // Left
+  glVertex3f(-.2,0,1.1);
+  glVertex3f(-.2,-1,1.1);
+  glVertex3f(-.2,-1,1.0);
+  glVertex3f(-.2,0,1.0);
+  glEnd();
+
+  glPopMatrix();
 }
 
 /*
@@ -231,8 +334,11 @@ void display()
      glDisable(GL_LIGHTING);
 
    //  Draw scene
-   cube(+1,0,0 , 0.5,0.5,0.5 , 0);
-   ball(-1,0,0 , 0.5);
+   drawHouse(0,0,-2 , 1,1,1, 0);
+   drawHouse(3,0,-2 , 1,1,1 , 0);
+   drawHouse(-3,0,-2 , 1,1,1 , 0);
+   drawHouse(6.5,0,-3 , 1.5,1,1 , 30);
+   drawHouse(-6.5,0,-3 , 1.5,1,1 , -30);
 
    //  Draw axes - no lighting from here on
    glDisable(GL_LIGHTING);

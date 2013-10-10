@@ -1,14 +1,32 @@
-hw=hw5
-all: $(hw)
+#  List of all programs you want to build
+EX=ex13
 
-#  Unix/Linux
-%: %.c;gcc -Wall -O3 -o $@ $< -lglut -lGLU -lGL -lm
+#  Libraries - Linux
+LIBS=-lglut -lGLU -lGL -lm
+#  Libraries - OSX
+#LIBS=-framework GLUT -framework OpenGL
+#  Libraries - MinGW
+#LIBS=-lglut32cu -lglu32 -lopengl32
 
-#  OSX
-#%: %.c;gcc -Wall -O3 -o $@ $< -framework GLUT -framework OpenGL
+#  Main target
+all: $(EX)
 
-#  MinGW
-#%: %.c;gcc -Wall -O3 -o $@ $< -lglut32cu -lglu32 -lopengl32
+#  Generic compile rules
+.c.o:
+	gcc -c -O -Wall $<
 
+#  Generic compile and link
+%: %.c CSCIx229.a
+	gcc -Wall -O3 -o $@ $^ $(LIBS)
+
+#  Delete unwanted files
 clean:
-	rm -f $(hw)
+	rm -f $(EX) *.o *.a
+
+#  Create archive (include glWindowPos here if you need it)
+CSCIx229.a:fatal.o loadtexbmp.o print.o project.o errcheck.o object.o
+	ar -rcs CSCIx229.a $^
+
+#  Obligatory UNIX inside joke
+love:
+	@echo "not war?"
