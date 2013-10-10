@@ -51,6 +51,57 @@ float ylight  =   0;  // Elevation of light
 int FPS=60;                   //  Frame rate
 static double smokeoffset=0;  //  Offset of smoke from origin
 
+
+/*
+ *  Draw vertex in polar coordinates with normal
+ */
+static void Vertex(double th,double ph)
+{
+   double x = Sin(th)*Cos(ph);
+   double y = Cos(th)*Cos(ph);
+   double z =         Sin(ph);
+   //  For a sphere at the origin, the position
+   //  and normal vectors are the same
+   glNormal3d(x,y,z);
+   glVertex3d(x,y,z);
+}
+
+/*
+ *  Draw a ball
+ *     at (x,y,z)
+ *     radius (r)
+ */
+void ball(double x,double y,double z,double r)
+{
+   int th,ph;
+   float yellow[] = {1.0,1.0,0.0,1.0};
+   float Emission[]  = {0.0,0.0,0.01*emission,1.0};
+   //  Save transformation
+   glPushMatrix();
+   //  Offset, scale and rotate
+   glTranslated(x,y,z);
+   glScaled(r,r,r);
+   //  White ball
+   glColor3f(1,1,1);
+   glMaterialfv(GL_FRONT,GL_SHININESS,shinyvec);
+   glMaterialfv(GL_FRONT,GL_SPECULAR,yellow);
+   glMaterialfv(GL_FRONT,GL_EMISSION,Emission);
+   //  Bands of latitude
+   for (ph=-90;ph<90;ph+=inc)
+   {
+      glBegin(GL_QUAD_STRIP);
+      for (th=0;th<=360;th+=2*inc)
+      {
+         Vertex(th,ph);
+         Vertex(th,ph+inc);
+      }
+      glEnd();
+   }
+   //  Undo transformations
+   glPopMatrix();
+}
+
+
 /*
  * Draw a house, given position x, y, z and scaling factors
  * dx, dy, dz and rotation about the z-axis th
@@ -232,7 +283,6 @@ static void drawHouse(double x, double y, double z,
   glEnd();
 
   // ball(0, 4, 0, 1);
-
   glPopMatrix();
 }
 
@@ -252,60 +302,72 @@ static void drawFencePost(double x, double y, double z,
   glTranslated(x, y, z);
   glRotated(th, 0, 1, 0);
   glScaled(dx, dy, dz);
+  
+  // Begin drawing body of fencepost
+  glBegin(GL_QUADS);
+  // Front
+  glColor3ub(200,200,200);
+  glNormal3f( 0, 0, 1);
+  glVertex3f(-1, 0, .5);
+  glVertex3f(+1, 0, .5);
+  glVertex3f(+1,+6, .5);
+  glVertex3f(-1,+6, .5);
+  // Back
+  glNormal3f( 0, 0,-1);
+  glVertex3f(+1, 0,-.5);
+  glVertex3f(-1, 0,-.5);
+  glVertex3f(-1,+6,-.5);
+  glVertex3f(+1,+6,-.5);
+  // Right
+  glNormal3f(+1, 0, 0);
+  glVertex3f(+1, 0,+.5);
+  glVertex3f(+1, 0,-.5);
+  glVertex3f(+1,+6,-.5);
+  glVertex3f(+1,+6,+.5);
+  // Left
+  glNormal3f(-1, 0, 0);
+  glVertex3f(-1, 0,-.5);
+  glVertex3f(-1, 0,+.5);
+  glVertex3f(-1,+6,+.5);
+  glVertex3f(-1,+6,-.5);
+  glEnd(); // End drawing main body
 
+  // Begin drawing top of fencepost
+  glBegin(GL_QUADS);
+  // Right
+  glNormal3f(+1, 0, 0);
+  glVertex3f(+1,+6,+.5);
+  glVertex3f(+1,+6,-.5);
+  glVertex3f(0 ,+7,-.5);
+  glVertex3f(0 ,+7,+.5);
+  // Left
+  glNormal3f(-1, 0, 0);
+  glVertex3f(-1,+6,-.5);
+  glVertex3f(-1,+6,+.5);
+  glVertex3f(0 ,+7,+.5);
+  glVertex3f(0 ,+7,-.5);
+  glEnd();
+
+  glBegin(GL_TRIANGLES);
+  // Front
+  glNormal3f(0, 0, 1);
+  glVertex3f(+1,+6,+.5);
+  glVertex3f(-1,+6,+.5);
+  glVertex3f(0 ,+7,+.5);
+  // Back
+  glNormal3f(0, 0,-1);
+  glVertex3f(+1,+6,-.5);
+  glVertex3f(-1,+6,-.5);
+  glVertex3f(0, +7,-.5);
+  glEnd();
+  // End drawing top of fencepost
 
   glPopMatrix();
 }
 
-
-
-/*
- *  Draw vertex in polar coordinates with normal
- */
-static void Vertex(double th,double ph)
-{
-   double x = Sin(th)*Cos(ph);
-   double y = Cos(th)*Cos(ph);
-   double z =         Sin(ph);
-   //  For a sphere at the origin, the position
-   //  and normal vectors are the same
-   glNormal3d(x,y,z);
-   glVertex3d(x,y,z);
-}
-
-/*
- *  Draw a ball
- *     at (x,y,z)
- *     radius (r)
- */
-void ball(double x,double y,double z,double r)
-{
-   int th,ph;
-   float yellow[] = {1.0,1.0,0.0,1.0};
-   float Emission[]  = {0.0,0.0,0.01*emission,1.0};
-   //  Save transformation
-   glPushMatrix();
-   //  Offset, scale and rotate
-   glTranslated(x,y,z);
-   glScaled(r,r,r);
-   //  White ball
-   glColor3f(1,1,1);
-   glMaterialfv(GL_FRONT,GL_SHININESS,shinyvec);
-   glMaterialfv(GL_FRONT,GL_SPECULAR,yellow);
-   glMaterialfv(GL_FRONT,GL_EMISSION,Emission);
-   //  Bands of latitude
-   for (ph=-90;ph<90;ph+=inc)
-   {
-      glBegin(GL_QUAD_STRIP);
-      for (th=0;th<=360;th+=2*inc)
-      {
-         Vertex(th,ph);
-         Vertex(th,ph+inc);
-      }
-      glEnd();
-   }
-   //  Undo transofrmations
-   glPopMatrix();
+static void drawScene(){
+  drawFencePost(0,0,0, .1,.1,.1, 0);
+  drawHouse(0,1,0 , 2,1,1, 0);
 }
 
 /*
@@ -373,8 +435,8 @@ void display()
 
    //  Draw scene
    
-   drawFencePost(0, 0, 0, 1, 1, 1, 0);
-   // drawHouse(0,0,-2 , 2,1,1, 0);
+
+   drawScene();
    //drawHouse(3,0,-2 , 1,1,1 , 0);
    //drawHouse(-3,0,-2 , 1,1,1 , 0);
    //drawHouse(6.5,0,-3 , 1.5,1,1 , 30);
