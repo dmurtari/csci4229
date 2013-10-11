@@ -366,7 +366,16 @@ static void drawFencePost(double x, double y, double z,
 }
 
 static void drawScene(){
-  drawFencePost(0,0,0, .1,.1,.1, 0);
+  // drawFencePost(-2,0,-1.2, .1,.1,.1, 90);
+  int i;
+
+  for(i = 0; i<=30; i+=2){
+    drawFencePost(-2,0,-1-(double)i/10, .05,.1,.05, 90);
+    drawFencePost( 2,0,-1-(double)i/10, .05,.1,.05, 90);
+  }
+  for(i = -18; i<=18; i+=2){
+    drawFencePost((double)i/10,0,-4, .05,.1,.05, 0);
+  }
   drawHouse(0,1,0 , 2,1,1, 0);
 }
 
