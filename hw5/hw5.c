@@ -27,7 +27,7 @@ int axes=1;       //  Display axes
 int mode=1;       //  Projection mode
 int move=1;       //  Move light
 int th=0;         //  Azimuth of view angle
-int ph=0;         //  Elevation of view angle
+int ph=10;         //  Elevation of view angle
 int fov=55;       //  Field of view (for perspective)
 int light=1;      //  Lighting
 double asp=1;     //  Aspect ratio
@@ -92,6 +92,40 @@ void ball(double x,double y,double z,double r)
       }
       glEnd();
    }
+   //  Undo transformations
+   glPopMatrix();
+}
+
+
+/*
+ *  Draw a sphere (version 2)
+ *     at (x,y,z)
+ *     radius (r)
+ */
+static void sphere2(double x,double y,double z,double r)
+{
+   const int d=5;
+   int th,ph;
+
+   //  Save transformation
+   glPushMatrix();
+   //  Offset and scale
+   glTranslated(x,y,z);
+   glScaled(r,r,r);
+
+   glColor3ub(0,100,0);
+   //  Latitude bands
+   for (ph=-90;ph<90;ph+=d)
+   {
+      glBegin(GL_QUAD_STRIP);
+      for (th=0;th<=360;th+=d)
+      {
+         Vertex(th,ph);
+         Vertex(th,ph+d);
+      }
+      glEnd();
+   }
+
    //  Undo transformations
    glPopMatrix();
 }
@@ -278,19 +312,27 @@ static void drawHouse(double x, double y, double z,
   glEnd();
  
   // Back Windows
-  // glEnable(GL_POLYGON_OFFSET_FILL);
-  // glPolygonOffset(3, 3);
+  glEnable(GL_POLYGON_OFFSET_FILL);
+  glPolygonOffset(-1, -1);
   glBegin(GL_QUADS);
   glColor3ub(0, 0, 200);
+  // Door
   glNormal3f(0, 0, -1);
-  glVertex3f(+.50, 0,-1.1);
-  glVertex3f(+.75,+1,-1.1);
-  glVertex3f(+.75,+1,-1.1);
-  glVertex3f(+.50, 0,-1.1);
+  glVertex3f(+.50,-1,-1);
+  glVertex3f(+.75,-1,-1);
+  glVertex3f(+.75, 0,-1);
+  glVertex3f(+.50, 0,-1);
+  // Windows
+  glNormal3f(0, 0, -1);
+  glVertex3f(-.5,-.5,-1);
+  glVertex3f(0,-.5,-1);
+  glVertex3f(0, 0, -1);
+  glVertex3f(-.5, 0, -1);
   glEnd();
-  //glDisable(GL_POLYGON_OFFSET_FILL);
+  glDisable(GL_POLYGON_OFFSET_FILL);
   
-  // ball(0, 4, 0, 1);
+  sphere2(0,-1,-1,.25);
+  sphere2(-.5,-1,-1,.3);
   glPopMatrix();
 }
 
@@ -385,6 +427,16 @@ static void drawScene(){
     drawFencePost((double)i/10,0,-4, .05,.1,.05, 0);
   }
   drawHouse(0,1,0 , 2,1,1, 0);
+  glColor3ub(0,30,0);
+  glBegin(GL_QUADS);
+  glNormal3f(0, 1, 0);
+  glVertex3f(-100,0,-100);
+  glVertex3f(-100,0,100);
+  glVertex3f(100,0,100);
+  glVertex3f(100,0,-100);
+  glEnd();
+
+
 }
 
 /*
@@ -458,14 +510,6 @@ void display()
    //drawHouse(-3,0,-2 , 1,1,1 , 0);
    //drawHouse(6.5,0,-3 , 1.5,1,1 , 30);
    //drawHouse(-6.5,0,-3 , 1.5,1,1 , -30);
-   glColor3ub(0,30,0);
-   glBegin(GL_QUADS);
-   glNormal3f(0, 1, 0);
-   glVertex3f(-100,-1,-100);
-   glVertex3f(-100,-1,100);
-   glVertex3f(100,-1,100);
-   glVertex3f(100,-1,-100);
-   glEnd();
 
 
    //  Draw axes - no lighting from here on
