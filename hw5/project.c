@@ -14,7 +14,7 @@ void Project(double fov,double asp,double dim)
       gluPerspective(fov,asp,dim/16,16*dim);
    //  Orthogonal transformation
    else
-      glOrtho(-asp*dim,asp*dim,-dim,+dim,-dim,+dim);
+      glOrtho(-asp*dim,asp*dim,-dim,+dim,-2*dim,+2*dim);
    //  Switch to manipulating the model matrix
    glMatrixMode(GL_MODELVIEW);
    //  Undo previous transformations
