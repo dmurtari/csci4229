@@ -47,11 +47,6 @@ float shinyvec[1];    // Shininess (value)
 int zh        =  90;  // Light azimuth
 float ylight  =   0;  // Elevation of light
 
-// Values to animate smoke
-int FPS=60;                   //  Frame rate
-static double smokeoffset=0;  //  Offset of smoke from origin
-
-
 /*
  *  Draw vertex in polar coordinates with normal
  */
@@ -281,7 +276,20 @@ static void drawHouse(double x, double y, double z,
   glVertex3f(-.2,-1,1.0);
   glVertex3f(-.2,0,1.0);
   glEnd();
-
+ 
+  // Back Windows
+  // glEnable(GL_POLYGON_OFFSET_FILL);
+  // glPolygonOffset(3, 3);
+  glBegin(GL_QUADS);
+  glColor3ub(0, 0, 200);
+  glNormal3f(0, 0, -1);
+  glVertex3f(+.50, 0,-1.1);
+  glVertex3f(+.75,+1,-1.1);
+  glVertex3f(+.75,+1,-1.1);
+  glVertex3f(+.50, 0,-1.1);
+  glEnd();
+  //glDisable(GL_POLYGON_OFFSET_FILL);
+  
   // ball(0, 4, 0, 1);
   glPopMatrix();
 }
@@ -519,10 +527,10 @@ void special(int key,int x,int y)
 {
    //  Right arrow key - increase angle by 5 degrees
    if (key == GLUT_KEY_RIGHT)
-      th += 5;
+      th -= 5;
    //  Left arrow key - decrease angle by 5 degrees
    else if (key == GLUT_KEY_LEFT)
-      th -= 5;
+      th += 5;
    //  Up arrow key - increase elevation by 5 degrees
    else if (key == GLUT_KEY_UP)
       ph += 5;
