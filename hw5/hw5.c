@@ -325,14 +325,32 @@ static void drawHouse(double x, double y, double z,
   // Windows
   glNormal3f(0, 0, -1);
   glVertex3f(-.5,-.5,-1);
-  glVertex3f(0,-.5,-1);
-  glVertex3f(0, 0, -1);
+  glVertex3f(0  ,-.5,-1);
+  glVertex3f(0  , 0, -1);
   glVertex3f(-.5, 0, -1);
+  glEnd();
+
+  glBegin(GL_QUADS);
+  // Right window
+  glNormal3f(0, 0, +1);
+  glVertex3f(+.4,-.5,+1);
+  glVertex3f(+.8,-.5,+1);
+  glVertex3f(+.8, 0 ,+1);
+  glVertex3f(+.4, 0 ,+1);
+  // Left windows
+  glNormal3f(0, 0, +1);
+  glVertex3f(-.4,-.5,+1);
+  glVertex3f(-.8,-.5,+1);
+  glVertex3f(-.8, 0 ,+1);
+  glVertex3f(-.4, 0 ,+1);
+
   glEnd();
   glDisable(GL_POLYGON_OFFSET_FILL);
   
   sphere2(0,-1,-1,.25);
   sphere2(-.5,-1,-1,.3);
+  sphere2(+.6,-1,+1,.3);
+  sphere2(-.6,-1,+1,.3);
   glPopMatrix();
 }
 
@@ -502,15 +520,8 @@ void display()
    else
      glDisable(GL_LIGHTING);
 
-   //  Draw scene
-   
-
+   // Draw scene
    drawScene();
-   //drawHouse(3,0,-2 , 1,1,1 , 0);
-   //drawHouse(-3,0,-2 , 1,1,1 , 0);
-   //drawHouse(6.5,0,-3 , 1.5,1,1 , 30);
-   //drawHouse(-6.5,0,-3 , 1.5,1,1 , -30);
-
 
    //  Draw axes - no lighting from here on
    glDisable(GL_LIGHTING);
@@ -537,7 +548,7 @@ void display()
    //  Display parameters
    glWindowPos2i(5,5);
    Print("Angle=%d,%d  Dim=%.1f FOV=%d Projection=%s Light=%s",
-     th,ph,dim,fov,mode?"Perpective":"Orthogonal",light?"On":"Off");
+     th,ph,dim,fov,mode?"Perspective":"Orthogonal",light?"On":"Off");
    if (light)
    {
       glWindowPos2i(5,45);
