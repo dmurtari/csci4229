@@ -346,11 +346,7 @@ static void drawHouse(double x, double y, double z,
 
   glEnd();
   glDisable(GL_POLYGON_OFFSET_FILL);
-  
-  sphere2(0,-1,-1,.25);
-  sphere2(-.5,-1,-1,.3);
-  sphere2(+.6,-1,+1,.3);
-  sphere2(-.6,-1,+1,.3);
+ 
   glPopMatrix();
 }
 
@@ -444,7 +440,17 @@ static void drawScene(){
   for(i = -18; i<=18; i+=2){
     drawFencePost((double)i/10,0,-4, .05,.1,.05, 0);
   }
+  
   drawHouse(0,1,0 , 2,1,1, 0);
+  // Drawing bushes 
+  sphere2(0,0,-1,.4);
+  sphere2(-.8,0,-1,.4);
+  sphere2(-1.5,0,-1,.4);
+  sphere2(+1.2,0,+1,.4);
+  sphere2(-1.2,0,+1,.4);
+
+
+  
   glColor3ub(0,30,0);
   glBegin(GL_QUADS);
   glNormal3f(0, 1, 0);
