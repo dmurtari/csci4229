@@ -1,0 +1,11 @@
+Project Proposal CSCI 4229: Domenic Murtari (Undergraduate)
+
+I am planning on recreating the game "Snake" in OpenGl. My idea is to keep the basic idea of the game the same, but to allow the user to rotate the view as they play the game, or to control the worm from a first-person view. 
+
+I will generate all of the objects without using any premade objects from GLU or GLUT, since the objects shouldn't be too complicated. My idea as of right now is to have the game board drawn, but to add more to it besides the traditional black or monochrome color. I am planning on drawing more complicated scenery around the game board, and to use textures to make the game look nicer.
+
+The player's main interaction should come from the basic control of the worm, but could also be moving the view around, and switching the view to and from first person and overhead views. 
+
+I am hoping to not spend too much time on the backend of the game itself and to be able to focus on the graphics, but I also would like to implement an AI where the player could potentially play against AI controlled worms (as a stretch goal).
+
+Further setting could be implemented such as changing the size of the gameboard depending on the player's preference, or allowing the user to change the lighting effects and
