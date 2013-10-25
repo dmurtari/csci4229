@@ -46,7 +46,6 @@ float shinyvec[1];       // Shininess (value)
 int zh        =  90;     // Light azimuth
 float ylight  =   0;     // Elevation of light
 unsigned int texture[9]; // Texture names
-unsigned int skybox[5];  // Skybox textures
 
 /*
  *  Draw vertex in polar coordinates with normal
@@ -497,58 +496,11 @@ void display()
    }
    else
      glDisable(GL_LIGHTING);
-
    // Draw scene
    drawScene();
 
    //  no lighting from here on
    glDisable(GL_LIGHTING);
-  // Enable Textures
-  glEnable(GL_TEXTURE_2D);
-  glTexEnvi(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE,GL_MODULATE);
-    
-  // Skybox
-  glBindTexture(GL_TEXTURE_2D,skybox[0]);
-  glBegin(GL_QUADS);
-  glTexCoord2f(0, 0); glVertex3f(-100,-100,+100);
-  glTexCoord2f(1, 0); glVertex3f(-100,-100,-100);
-  glTexCoord2f(1, 1); glVertex3f(-100,+100,-100);
-  glTexCoord2f(0, 1); glVertex3f(-100,+100,+100);
-  glEnd();
-
-  glBindTexture(GL_TEXTURE_2D,skybox[1]);
-  glBegin(GL_QUADS);
-  glTexCoord2f(1.0, 0.0); glVertex3f(+100,-100,-100);
-  glTexCoord2f(1.0, 1.0); glVertex3f(+100,+100,-100);
-  glTexCoord2f(0.0, 1.0); glVertex3f(-100,+100,-100);
-  glTexCoord2f(0.0, 0.0); glVertex3f(-100,-100,-100);
-  glEnd();
-
-  glBindTexture(GL_TEXTURE_2D,skybox[2]);
-  glBegin(GL_QUADS);
-  glTexCoord2f(0.0, 0.0); glVertex3f(+100,-100,-100);
-  glTexCoord2f(1.0, 0.0); glVertex3f(+100,-100,+100);
-  glTexCoord2f(1.0, 1.0); glVertex3f(+100,+100,+100);
-  glTexCoord2f(0.0, 1.0); glVertex3f(+100,+100,-100);
-  glEnd();
-
-  glBindTexture(GL_TEXTURE_2D,skybox[3]);
-  glBegin(GL_QUADS);
-  glTexCoord2f(0.0, 0.0); glVertex3f(+100,-100,+100);
-  glTexCoord2f(1.0, 0.0); glVertex3f(-100,-100,+100);
-  glTexCoord2f(1.0, 1.0); glVertex3f(-100,+100,+100);
-  glTexCoord2f(0.0, 1.0); glVertex3f(+100,+100,+100);
-  glEnd();
-
-  glBindTexture(GL_TEXTURE_2D,skybox[4]);
-  glBegin(GL_QUADS);
-  glTexCoord2f(0.0, 0.0); glVertex3f(+100,+100,+100);
-  glTexCoord2f(1.0, 0.0); glVertex3f(+100,+100,-100);
-  glTexCoord2f(1.0, 1.0); glVertex3f(-100,+100,-100);
-  glTexCoord2f(0.0, 1.0); glVertex3f(-100,+100,+100);
-  glEnd();
-
-  glDisable(GL_TEXTURE_2D);
 
    //  Display parameters
    glWindowPos2i(5,5);
@@ -603,20 +555,7 @@ void special(int key,int x,int y)
    //  PageDown key - decrease dim
    else if (key == GLUT_KEY_PAGE_UP && dim>1)
       dim -= 0.1;
-   //  Smooth color model
-   else if (key == GLUT_KEY_F1)
-      smooth = 1-smooth;
-   //  Local Viewer
-   else if (key == GLUT_KEY_F2)
-      local = 1-local;
-   else if (key == GLUT_KEY_F3)
-      distance = (distance==1) ? 5 : 1;
-   //  Toggle ball increment
-   else if (key == GLUT_KEY_F8)
-      inc = (inc==10)?3:10;
-   //  Flip sign
-   else if (key == GLUT_KEY_F9)
-      one = -one;
+
    //  Keep angles to +/-360 degrees
    th %= 360;
    ph %= 360;
@@ -661,31 +600,6 @@ void key(unsigned char ch,int x,int y)
       ylight -= 0.1;
    else if (ch==']')
       ylight += 0.1;
-   //  Ambient level
-   else if (ch=='a' && ambient>0)
-      ambient -= 5;
-   else if (ch=='A' && ambient<100)
-      ambient += 5;
-   //  Diffuse level
-   else if (ch=='d' && diffuse>0)
-      diffuse -= 5;
-   else if (ch=='D' && diffuse<100)
-      diffuse += 5;
-   //  Specular level
-   else if (ch=='s' && specular>0)
-      specular -= 5;
-   else if (ch=='S' && specular<100)
-      specular += 5;
-   //  Emission level
-   else if (ch=='e' && emission>0)
-      emission -= 5;
-   else if (ch=='E' && emission<100)
-      emission += 5;
-   //  Shininess level
-   else if (ch=='n' && shininess>-1)
-      shininess -= 1;
-   else if (ch=='N' && shininess<7)
-      shininess += 1;
    //  Translate shininess power to value (-1 => 0)
    shinyvec[0] = shininess<0 ? 0 : pow(2.0,shininess);
    //  Reproject
@@ -736,12 +650,6 @@ int main(int argc,char* argv[])
    texture[6] = LoadTexBMP("dark.bmp");
    texture[7] = LoadTexBMP("sidewalk.bmp");
    texture[8] = LoadTexBMP("road.bmp");
-   // Skybox textures
-   skybox[0] = LoadTexBMP("sbL.bmp");
-   skybox[1] = LoadTexBMP("sbF.bmp");
-   skybox[2] = LoadTexBMP("sbR.bmp");
-   skybox[3] = LoadTexBMP("sbB.bmp");
-   skybox[4] = LoadTexBMP("sbT.bmp");
    //  Pass control to GLUT so it can interact with the user
    ErrCheck("init");
    glutMainLoop();
