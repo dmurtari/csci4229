@@ -27,25 +27,26 @@ int axes=1;       //  Display axes
 int mode=1;       //  Projection mode
 int move=1;       //  Move light
 int th=0;         //  Azimuth of view angle
-int ph=10;         //  Elevation of view angle
+int ph=10;        //  Elevation of view angle
 int fov=55;       //  Field of view (for perspective)
 int light=1;      //  Lighting
 double asp=1;     //  Aspect ratio
 double dim=3.0;   //  Size of world
 // Light values
-int one       =   1;  // Unit value
-int distance  =   5;  // Light distance
-int inc       =  10;  // Ball increment
-int smooth    =   1;  // Smooth/Flat shading
-int local     =   0;  // Local Viewer Model
-int emission  =   0;  // Emission intensity (%)
-int ambient   =  30;  // Ambient intensity (%)
-int diffuse   = 100;  // Diffuse intensity (%)
-int specular  =   0;  // Specular intensity (%)
-int shininess =   0;  // Shininess (power of two)
-float shinyvec[1];    // Shininess (value)
-int zh        =  90;  // Light azimuth
-float ylight  =   0;  // Elevation of light
+int one       =   1;     // Unit value
+int distance  =   5;     // Light distance
+int inc       =  10;     // Ball increment
+int smooth    =   1;     // Smooth/Flat shading
+int local     =   0;     // Local Viewer Model
+int emission  =   0;     // Emission intensity (%)
+int ambient   =  30;     // Ambient intensity (%)
+int diffuse   = 100;     // Diffuse intensity (%)
+int specular  =   0;     // Specular intensity (%)
+int shininess =   0;     // Shininess (power of two)
+float shinyvec[1];       // Shininess (value)
+int zh        =  90;     // Light azimuth
+float ylight  =   0;     // Elevation of light
+unsigned int texture[3]; // Texture names
 
 /*
  *  Draw vertex in polar coordinates with normal
@@ -159,36 +160,37 @@ static void drawHouse(double x, double y, double z,
   glRotated(th, 0, 1, 0);
   glScaled(dx, dy, dz);
 
+  // Enable Textures
+  glEnable(GL_TEXTURE_2D);
+  glTexEnvi(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE,GL_MODULATE);
+
   // Body of house
+  glBindTexture(GL_TEXTURE_2D,texture[1]); // Brick
   glBegin(GL_QUADS);
   //Front
-  glColor3ub(153,0,0);
   glNormal3f( 0, 0, 1);
-  glVertex3f(-1,-1, 1);
-  glVertex3f(+1,-1, 1);
-  glVertex3f(+1,+1, 1);
-  glVertex3f(-1,+1, 1);
+  glTexCoord2f(0.0, 0.0); glVertex3f(-1,-1, 1);
+  glTexCoord2f(5.0, 0.0); glVertex3f(+1,-1, 1);
+  glTexCoord2f(5.0, 5.0); glVertex3f(+1,+1, 1);
+  glTexCoord2f(0.0, 5.0); glVertex3f(-1,+1, 1);
   //  Back
-  glColor3ub(153,0,0);
   glNormal3f( 0, 0,-1);
-  glVertex3f(+1,-1,-1);
-  glVertex3f(-1,-1,-1);
-  glVertex3f(-1,+1,-1);
-  glVertex3f(+1,+1,-1);
+  glTexCoord2f(0.0, 0.0); glVertex3f(+1,-1,-1);
+  glTexCoord2f(5.0, 0.0); glVertex3f(-1,-1,-1);
+  glTexCoord2f(5.0, 5.0); glVertex3f(-1,+1,-1);
+  glTexCoord2f(0.0, 5.0); glVertex3f(+1,+1,-1);
   //  Right
-  glColor3ub(153,100,0);
   glNormal3f(+1, 0, 0);
-  glVertex3f(+1,-1,+1);
-  glVertex3f(+1,-1,-1);
-  glVertex3f(+1,+1,-1);
-  glVertex3f(+1,+1,+1);
+  glTexCoord2f(0.0, 0.0); glVertex3f(+1,-1,+1);
+  glTexCoord2f(5.0, 0.0); glVertex3f(+1,-1,-1);
+  glTexCoord2f(5.0, 5.0); glVertex3f(+1,+1,-1);
+  glTexCoord2f(0.0, 5.0); glVertex3f(+1,+1,+1);
   //  Left
-  glColor3ub(153,100,0);
   glNormal3f(-1, 0, 0);
-  glVertex3f(-1,-1,-1);
-  glVertex3f(-1,-1,+1);
-  glVertex3f(-1,+1,+1);
-  glVertex3f(-1,+1,-1);
+  glTexCoord2f(0.0, 0.0); glVertex3f(-1,-1,-1);
+  glTexCoord2f(5.0, 0.0); glVertex3f(-1,-1,+1);
+  glTexCoord2f(5.0, 5.0); glVertex3f(-1,+1,+1);
+  glTexCoord2f(0.0, 5.0); glVertex3f(-1,+1,-1);
   //  Top
   glColor3ub(153,0,100);
   glNormal3f( 0,+1, 0);
@@ -206,6 +208,7 @@ static void drawHouse(double x, double y, double z,
   glEnd();
   
   // Roof
+  glBindTexture(GL_TEXTURE_2D,texture[2]);  // Shingles
   glBegin(GL_TRIANGLES);
   // Front
   glColor3ub(30,30,30);
@@ -346,7 +349,7 @@ static void drawHouse(double x, double y, double z,
 
   glEnd();
   glDisable(GL_POLYGON_OFFSET_FILL);
- 
+  glDisable(GL_TEXTURE_2D); 
   glPopMatrix();
 }
 
@@ -442,6 +445,10 @@ static void drawScene(){
   }
   
   drawHouse(0,1,0 , 2,1,1, 0);
+
+  glEnable(GL_TEXTURE_2D);
+  glTexEnvi(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE,GL_MODULATE);
+
   // Drawing bushes 
   sphere2(0,0,-1,.4);
   sphere2(-.8,0,-1,.4);
@@ -450,16 +457,17 @@ static void drawScene(){
   sphere2(-1.2,0,+1,.4);
 
 
-  
+  // Draw Ground
+  glBindTexture(GL_TEXTURE_2D,texture[0]);
   glColor3ub(0,30,0);
   glBegin(GL_QUADS);
   glNormal3f(0, 1, 0);
-  glVertex3f(-100,0,-100);
-  glVertex3f(-100,0,100);
-  glVertex3f(100,0,100);
-  glVertex3f(100,0,-100);
+  glTexCoord2f(0.0,  0.0);   glVertex3f(-100,0,-100);
+  glTexCoord2f(200.0,0.0);   glVertex3f(-100,0,100);
+  glTexCoord2f(200.0,200.0); glVertex3f(100,0,100);
+  glTexCoord2f(0.0,  200.0); glVertex3f(100,0,-100);
   glEnd();
-
+  glDisable(GL_TEXTURE_2D);
 
 }
 
@@ -722,14 +730,18 @@ int main(int argc,char* argv[])
    glutInit(&argc,argv);
    //  Request double buffered, true color window with Z buffering at 600x600
    glutInitDisplayMode(GLUT_RGB | GLUT_DEPTH | GLUT_DOUBLE);
-   glutInitWindowSize(400,400);
-   glutCreateWindow("Lighting");
+   glutInitWindowSize(600,600);
+   glutCreateWindow("Assignment 7: Domenic Murtari");
    //  Set callbacks
    glutDisplayFunc(display);
    glutReshapeFunc(reshape);
    glutSpecialFunc(special);
    glutKeyboardFunc(key);
    glutIdleFunc(idle);
+   //  Load textures
+   texture[0] = LoadTexBMP("ground.bmp");
+   texture[1] = LoadTexBMP("wall.bmp");
+   texture[2] = LoadTexBMP("shingle.bmp");
    //  Pass control to GLUT so it can interact with the user
    ErrCheck("init");
    glutMainLoop();
