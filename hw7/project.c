@@ -11,7 +11,7 @@ void Project(double fov,double asp,double dim)
    glLoadIdentity();
    //  Perspective transformation
    if (fov)
-      gluPerspective(fov,asp,dim/16,16*dim);
+      gluPerspective(fov,asp,dim/16,1000*dim);
    //  Orthogonal transformation
    else
       glOrtho(-asp*dim,asp*dim,-dim,+dim,-2*dim,+2*dim);

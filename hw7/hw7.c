@@ -23,7 +23,6 @@
  */
 #include "CSCIx229.h"
 
-int axes=1;       //  Display axes
 int mode=1;       //  Projection mode
 int move=1;       //  Move light
 int th=0;         //  Azimuth of view angle
@@ -46,7 +45,8 @@ int shininess =   0;     // Shininess (power of two)
 float shinyvec[1];       // Shininess (value)
 int zh        =  90;     // Light azimuth
 float ylight  =   0;     // Elevation of light
-unsigned int texture[6]; // Texture names
+unsigned int texture[9]; // Texture names
+unsigned int skybox[5];  // Skybox textures
 
 /*
  *  Draw vertex in polar coordinates with normal
@@ -97,44 +97,6 @@ void ball(double x,double y,double z,double r)
    //  Undo transformations
    glPopMatrix();
 }
-
-
-/*
- *  Draw a sphere (version 2)
- *     at (x,y,z)
- *     radius (r)
- */
-static void sphere2(double x,double y,double z,double r)
-{
-   const int d=5;
-   int th,ph;
-
-   //  Save transformation
-   glPushMatrix();
-   //  Offset and scale
-   glTranslated(x,y,z);
-   glScaled(r,r,r);
-   glTexEnvi(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE,GL_MODULATE);
-   glBindTexture(GL_TEXTURE_2D,texture[0]);
-   glColor3ub(0,100,0);
-   //  Latitude bands
-   for (ph=-90;ph<90;ph+=d)
-   {
-      glBegin(GL_QUAD_STRIP);
-      for (th=0;th<=360;th+=d)
-      {
-         glTexCoord2f(1/2*Cos(th)+0.5,1/2*Sin(th)+0.5); Vertex(th,ph);
-         glTexCoord2f(1/2*Cos(th)+0.5,1/2*Sin(th)+0.5); Vertex(th,ph+d);
-      }
-      glEnd();
-   }
-
-   //  Undo transformations
-   glPopMatrix();
-   glDisable(GL_TEXTURE_2D); 
-
-}
-
 
 /*
  * Draw a house, given position x, y, z and scaling factors
@@ -276,13 +238,17 @@ static void drawHouse(double x, double y, double z,
   glTexCoord2f(2.0, 0.0); glVertex3f(+.5,+1,+.25);
   glTexCoord2f(2.0, 2.0); glVertex3f(+1,+1,+.25);
   glTexCoord2f(0.0, 2.0); glVertex3f(+1,+2,+.25);
-  // Top
-  glVertex3f(+.5,+2,+.25);
-  glVertex3f(+.5,+2,-.25);
-  glVertex3f(+1,+2,-.25);
-  glVertex3f(+1,+2,+.25);
   glEnd();
-  
+  glBindTexture(GL_TEXTURE_2D, texture[6]);
+  glBegin(GL_QUADS);
+  // Top
+  glTexCoord2f(0.0, 0.0); glVertex3f(+.5,+2,+.25);
+  glTexCoord2f(2.0, 0.0); glVertex3f(+.5,+2,-.25);
+  glTexCoord2f(2.0, 2.0); glVertex3f(+1,+2,-.25);
+  glTexCoord2f(0.0, 2.0); glVertex3f(+1,+2,+.25);
+  glEnd();
+
+
   // Draw a Door
   glEnable(GL_POLYGON_OFFSET_FILL);
   glPolygonOffset(-1, -1);
@@ -329,8 +295,9 @@ static void drawHouse(double x, double y, double z,
   glTexCoord2f(1.0, 0.0); glVertex3f(-.8,-.5,+1);
   glTexCoord2f(1.0, 1.0); glVertex3f(-.8, 0 ,+1);
   glTexCoord2f(0.0, 1.0); glVertex3f(-.4, 0 ,+1);
-
   glEnd();
+
+
   glDisable(GL_POLYGON_OFFSET_FILL);
   glDisable(GL_TEXTURE_2D); 
   glPopMatrix();
@@ -429,13 +396,6 @@ static void drawScene(){
   
   drawHouse(0,1,0 , 2,1,1, 0);
 
-  // Drawing bushes 
-  sphere2(0,0,-1,.4);
-  sphere2(-.8,0,-1,.4);
-  sphere2(-1.5,0,-1,.4);
-  sphere2(+1.2,0,+1,.4);
-  sphere2(-1.2,0,+1,.4);
-
   glEnable(GL_TEXTURE_2D);
   glTexEnvi(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE,GL_MODULATE);
 
@@ -449,7 +409,30 @@ static void drawScene(){
   glTexCoord2f(200.0,200.0); glVertex3f(100,0,100);
   glTexCoord2f(0.0,  200.0); glVertex3f(100,0,-100);
   glEnd();
+ 
+  // Sidewalk
+  glEnable(GL_POLYGON_OFFSET_FILL);
+  glBindTexture(GL_TEXTURE_2D,texture[7]);
+  glBegin(GL_QUADS);
+  glTexCoord2f(0.0, 0.0); glVertex3f(.4,0,0);
+  glTexCoord2f(4.0, 0.0); glVertex3f(.4,0,5);
+  glTexCoord2f(4.0, 4.0); glVertex3f(-.4,0,5);
+  glTexCoord2f(0.0, 4.0); glVertex3f(-.4,0,0);
+  glEnd();
+
+  // Road
+  glBindTexture(GL_TEXTURE_2D,texture[8]);
+  glBegin(GL_QUADS);
+  glTexCoord2f(4.0, 0.0); glVertex3f(40,0,5);
+  glTexCoord2f(4.0, 1.0); glVertex3f(40,0,7);
+  glTexCoord2f(0.0, 1.0); glVertex3f(-40,0,7);
+  glTexCoord2f(0.0, 0.0); glVertex3f(-40,0,5);
+  glEnd(); 
+  glDisable(GL_POLYGON_OFFSET_FILL);
+ 
   glDisable(GL_TEXTURE_2D);
+
+
 
 }
 
@@ -458,7 +441,6 @@ static void drawScene(){
  */
 void display()
 {
-   const double len=2.0;  //  Length of axes
    //  Erase the window and the depth buffer
    glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
    //  Enable Z-buffering in OpenGL
@@ -519,27 +501,54 @@ void display()
    // Draw scene
    drawScene();
 
-   //  Draw axes - no lighting from here on
+   //  no lighting from here on
    glDisable(GL_LIGHTING);
-   glColor3f(1,1,1);
-   if (axes)
-   {
-      glBegin(GL_LINES);
-      glVertex3d(0.0,0.0,0.0);
-      glVertex3d(len,0.0,0.0);
-      glVertex3d(0.0,0.0,0.0);
-      glVertex3d(0.0,len,0.0);
-      glVertex3d(0.0,0.0,0.0);
-      glVertex3d(0.0,0.0,len);
-      glEnd();
-      //  Label axes
-      glRasterPos3d(len,0.0,0.0);
-      Print("X");
-      glRasterPos3d(0.0,len,0.0);
-      Print("Y");
-      glRasterPos3d(0.0,0.0,len);
-      Print("Z");
-   }
+  // Enable Textures
+  glEnable(GL_TEXTURE_2D);
+  glTexEnvi(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE,GL_MODULATE);
+    
+  // Skybox
+  glBindTexture(GL_TEXTURE_2D,skybox[0]);
+  glBegin(GL_QUADS);
+  glTexCoord2f(0, 0); glVertex3f(-100,-100,+100);
+  glTexCoord2f(1, 0); glVertex3f(-100,-100,-100);
+  glTexCoord2f(1, 1); glVertex3f(-100,+100,-100);
+  glTexCoord2f(0, 1); glVertex3f(-100,+100,+100);
+  glEnd();
+
+  glBindTexture(GL_TEXTURE_2D,skybox[1]);
+  glBegin(GL_QUADS);
+  glTexCoord2f(1.0, 0.0); glVertex3f(+100,-100,-100);
+  glTexCoord2f(1.0, 1.0); glVertex3f(+100,+100,-100);
+  glTexCoord2f(0.0, 1.0); glVertex3f(-100,+100,-100);
+  glTexCoord2f(0.0, 0.0); glVertex3f(-100,-100,-100);
+  glEnd();
+
+  glBindTexture(GL_TEXTURE_2D,skybox[2]);
+  glBegin(GL_QUADS);
+  glTexCoord2f(0.0, 0.0); glVertex3f(+100,-100,-100);
+  glTexCoord2f(1.0, 0.0); glVertex3f(+100,-100,+100);
+  glTexCoord2f(1.0, 1.0); glVertex3f(+100,+100,+100);
+  glTexCoord2f(0.0, 1.0); glVertex3f(+100,+100,-100);
+  glEnd();
+
+  glBindTexture(GL_TEXTURE_2D,skybox[3]);
+  glBegin(GL_QUADS);
+  glTexCoord2f(0.0, 0.0); glVertex3f(+100,-100,+100);
+  glTexCoord2f(1.0, 0.0); glVertex3f(-100,-100,+100);
+  glTexCoord2f(1.0, 1.0); glVertex3f(-100,+100,+100);
+  glTexCoord2f(0.0, 1.0); glVertex3f(+100,+100,+100);
+  glEnd();
+
+  glBindTexture(GL_TEXTURE_2D,skybox[4]);
+  glBegin(GL_QUADS);
+  glTexCoord2f(0.0, 0.0); glVertex3f(+100,+100,+100);
+  glTexCoord2f(1.0, 0.0); glVertex3f(+100,+100,-100);
+  glTexCoord2f(1.0, 1.0); glVertex3f(-100,+100,-100);
+  glTexCoord2f(0.0, 1.0); glVertex3f(-100,+100,+100);
+  glEnd();
+
+  glDisable(GL_TEXTURE_2D);
 
    //  Display parameters
    glWindowPos2i(5,5);
@@ -628,9 +637,6 @@ void key(unsigned char ch,int x,int y)
    //  Reset view angle
    else if (ch == '0')
       th = ph = 0;
-   //  Toggle axes
-   else if (ch == 'x' || ch == 'X')
-      axes = 1-axes;
    //  Toggle lighting
    else if (ch == 'l' || ch == 'L')
       light = 1-light;
@@ -727,7 +733,15 @@ int main(int argc,char* argv[])
    texture[3] = LoadTexBMP("stucco.bmp");
    texture[4] = LoadTexBMP("door.bmp");
    texture[5] = LoadTexBMP("window.bmp");
-
+   texture[6] = LoadTexBMP("dark.bmp");
+   texture[7] = LoadTexBMP("sidewalk.bmp");
+   texture[8] = LoadTexBMP("road.bmp");
+   // Skybox textures
+   skybox[0] = LoadTexBMP("sbL.bmp");
+   skybox[1] = LoadTexBMP("sbF.bmp");
+   skybox[2] = LoadTexBMP("sbR.bmp");
+   skybox[3] = LoadTexBMP("sbB.bmp");
+   skybox[4] = LoadTexBMP("sbT.bmp");
    //  Pass control to GLUT so it can interact with the user
    ErrCheck("init");
    glutMainLoop();
